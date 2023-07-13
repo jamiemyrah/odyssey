@@ -68,7 +68,7 @@ async deleteById(request, response){
     const { id } = request.query;
     try{
         await connection.connect();
-        const result = await connection.query(`DELETE FROM user WHERE user_id = ?`, [id]);  
+        const result = await connection.query(`DELETE FROM order_item WHERE order_item_id = ?`, [id]);  
         if(result){
             return response.status(200).send({result});
         }
@@ -85,7 +85,7 @@ async delete(request, response){
     let connection = await createConnection();
     try{
         await connection.connect();
-        let sql = `DELETE FROM user WHERE `;
+        let sql = `DELETE FROM order_item WHERE `;
         let keys = Object.keys(request.query);
         let counter = 0;
         for(let key of keys){
@@ -118,7 +118,7 @@ async findById(request, response){
     const {id} = request.query;
     try{
         await connection.connect();
-        const fetchResult = await connection.query(`SELECT * FROM user WHERE user_id = ?`, [id]);
+        const fetchResult = await connection.query(`SELECT * FROM order_item WHERE order_item_id = ?`, [id]);
         return response.status(200).send(fetchResult[0][0]);
     }catch(error){
         console.log(error);
@@ -132,7 +132,7 @@ async findOne(request, response){
     let connection = await createConnection();
     try{
         await connection.connect();
-        let sql = `SELECT * FROM user WHERE `;
+        let sql = `SELECT * FROM order_item WHERE `;
         let keys = Object.keys(request.query);
         let counter = 0;
         for(let key of keys){
@@ -172,8 +172,8 @@ async findAndCountAll(request, response){
         if(request.query.limit){
             limit = +request.query.limit;
         }
-        const fetchResult = await connection.query(`SELECT * FROM user  LIMIT ${limit} OFFSET ${offset}`);
-        const countResult = await connection.query(`SELECT COUNT('user_id') as count FROM user`);
+        const fetchResult = await connection.query(`SELECT * FROM order_item  LIMIT ${limit} OFFSET ${offset}`);
+        const countResult = await connection.query(`SELECT COUNT('order_item_id') as count FROM order_item`);
         return response.status(200).send({ users: fetchResult[0] , count: countResult[0][0].count });
     }catch(error){
         console.log(error);
@@ -187,7 +187,7 @@ async deleteOne(request, response){
     let connection = await createConnection();
     try{
         await connection.connect();
-        let sql = `DELETE FROM user WHERE `;
+        let sql = `DELETE FROM order_item WHERE `;
         let keys = Object.keys(request.query);
         let counter = 0;
         for(let key of keys){
@@ -221,7 +221,7 @@ async update(request, response){
     let connection = await createConnection();
     try{
         await connection.connect();
-        let sql = `UPDATE user SET `;
+        let sql = `UPDATE order_item SET `;
         let keys = Object.keys(request.body);
         let counter = 0;
         for(let key of keys){

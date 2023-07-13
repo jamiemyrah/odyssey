@@ -1,267 +1,160 @@
-const { createConnection } = require('../utils/db-utils');
-
+const { createConnection } = require('../utils/db-utils')
 const OrderController = {
-  async create(request, response) {
-    let connection = await createConnection();
-    try {
-        await connection.connect();
-    
-        const result = await connection.query(
-          `INSERT INTO orders (user_id, order_date, debt) VALUES (?, CURRENT_TIMESTAMP, ?)`,
-          [request.body.user_id, request.body.debt]
-        );
-    
-        if(result){
-          return response.status(200).send({result});
-      }
-      return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    
-        
-    } catch (error) {
-      console.log(error);
-      return response.status(500).send({ error });
-    }
-  },
-
-  async updateById(request, response){
-    let connection = await createConnection();
-    const { id } = request.query;
-    try{
-        await connection.connect();
-        let sql = `UPDATE user SET `;
-        let keys = Object.keys(request.body);
-        let counter = 0;
-        for(let key of keys){
-            counter++;
-            sql += `${key} = ?`;
-            if(counter < keys.length){
-                sql += `,`;
+    async create(request, response){
+        try{
+            let connection = await createConnection();
+        try{
+            await connection.connect();
+            let totalCost = 0;
+            for(let one of request.body.orderItems){
+                totalCost += (one.unitPrice* one.quantity);
             }
-        }
-        sql += `WHERE user_id = ?`;
-        const values = [];
-        for(let key of keys){
-            values.push(request.body[key]);
-        }
-        values.push(id);
-        const result = await connection.query(sql, [...values]);
-          
-        if(result){
-            return response.status(200).send({result});
-        }
-        return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
-
-async deleteById(request, response){
-    let connection = await createConnection();
-    const { id } = request.query;
-    try{
-        await connection.connect();
-        const result = await connection.query(`DELETE FROM user WHERE user_id = ?`, [id]);  
-        if(result){
-            return response.status(200).send({result});
-        }
-        return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
-
-async delete(request, response){
-    let connection = await createConnection();
-    try{
-        await connection.connect();
-        let sql = `DELETE FROM user WHERE `;
-        let keys = Object.keys(request.query);
-        let counter = 0;
-        for(let key of keys){
-            counter++;
-            sql += `${key} = ?`;
-            if(counter < keys.length){
-                sql += ` AND `;
+            const result = await connection.query(`INSERT INTO orders (user_id, debt) VALUES(?,?)`, [
+                request.body.user_id,
+                totalCost > 2000 ? totalCost - 2000 : null
+            ]);
+            if(result){
+                const orderId = result[0].insertId;
+                for(let one of request.body.orderItems){
+                    await connection.query(`INSERT INTO order_item (order_id,item_name,unit_price,quantity) VALUES(?,?,?,? )`, [
+                        orderId,
+                        one.itemName,
+                        one.unitPrice,
+                        one.quantity
+                    ]);
+                }
+                return response.status(200).send({result});
             }
+            return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }finally{
+            await connection.end();
         }
-        const values = [];
-        for(let key of keys){
-            values.push(request.query[key]);
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
         }
-        const result = await connection.query(sql, [...values]);
-          
-        if(result){
-            return response.status(200).send({result});
-        }
-        return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
+    },
 
-async findById(request, response){
-    let connection = await createConnection();
-    const {id} = request.query;
-    try{
-        await connection.connect();
-        const fetchResult = await connection.query(`SELECT * FROM user WHERE user_id = ?`, [id]);
-        return response.status(200).send(fetchResult[0][0]);
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
+    async updateById(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
 
-async findOne(request, response){
-    let connection = await createConnection();
-    try{
-        await connection.connect();
-        let sql = `SELECT * FROM user WHERE `;
-        let keys = Object.keys(request.query);
-        let counter = 0;
-        for(let key of keys){
-            counter++;
-            sql += `${key} = ?`;
-            if(counter < keys.length){
-                sql += ` AND `;
+    async deleteById(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
+
+    async delete(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
+
+    async findById(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
+
+    async findOne(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
+
+    async findAndCountAll(request, response){
+        let connection = await createConnection();
+        try{
+            await connection.connect();
+            let offset = 0;
+            let limit = 100;
+            if(request.query.offset){
+                offset = +request.query.offset;
             }
-        }
 
-        sql += ` LIMIT 1 OFFSET 0`
-
-        const values = [];
-        for(let key of keys){
-            values.push(request.query[key]);
-        }
-        const fetchResult = await connection.query(sql, [...values]);
-        return response.status(200).send(fetchResult[0][0]);
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
-
-async findAndCountAll(request, response){
-    let connection = await createConnection();
-    try{
-        await connection.connect();
-        let offset = 0;
-        let limit = 100;
-        if(request.query.offset){
-            offset = +request.query.offset;
-        }
-
-        if(request.query.limit){
-            limit = +request.query.limit;
-        }
-        const fetchResult = await connection.query(`SELECT * FROM user  LIMIT ${limit} OFFSET ${offset}`);
-        const countResult = await connection.query(`SELECT COUNT('user_id') as count FROM user`);
-        return response.status(200).send({ users: fetchResult[0] , count: countResult[0][0].count });
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
-
-async deleteOne(request, response){
-    let connection = await createConnection();
-    try{
-        await connection.connect();
-        let sql = `DELETE FROM user WHERE `;
-        let keys = Object.keys(request.query);
-        let counter = 0;
-        for(let key of keys){
-            counter++;
-            sql += `${key} = ?`;
-            if(counter < keys.length){
-                sql += ` AND `;
+            if(request.query.limit){
+                limit = +request.query.limit;
             }
-        }
 
-        sql += ` LIMIT 1;`;
-        const values = [];
-        for(let key of keys){
-            values.push(request.query[key]);
-        }
-        const result = await connection.query(sql, [...values]);
-          
-        if(result){
-            return response.status(200).send({result});
-        }
-        return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
+            let sql = `SELECT orders.*,user.all, order_item.order_item_id, order_item.order_Id AS referenced_id, order_item.item_name, order_item.unit_price, order_item.quantity FROM orders 
+            LEFT JOIN order_item ON  orders.order_id = order_item.order_id 
+            INNER JOIN user ON  orders.user_id = user_id 
+            LIMIT ${limit} OFFSET ${offset}`
+            const ordersMap = {};
+            const fetchResult = await connection.query(sql, []);
+            if(Array.isArray(fetchResult[0]) && fetchResult[0].length){
+                let count = 0;
+                for(let one of fetchResult[0]){
+                    if(!ordersMap[`${one.order_id}`]){
+                        ordersMap[`${one.order_id}`] = {
+                            order_id: one.order_id,
+                            user_id: one.user_id,
+                            order_date: one.order_date,
+                            debt: one.debt,
+                            user: {
+                                names: one.names,
+                                user_id: one.user_id,
+                            },
+                            order_items: []
+                        }
+                    }
 
-async update(request, response){
-    let connection = await createConnection();
-    try{
-        await connection.connect();
-        let sql = `UPDATE user SET `;
-        let keys = Object.keys(request.body);
-        let counter = 0;
-        for(let key of keys){
-            counter++;
-            sql += `${key} = ?`;
-            if(counter < keys.length){
-                sql += `,`;
+                    if(one.order_item_id){
+                        ordersMap[`${one.order_id}`].order_items.push({
+                            order_item_id: one.order_item_id,
+                            item_name: one.item_name,
+                            unit_price: one.unit_price,
+                            quantity: one.quantity
+                        });
+                    }
+                }
             }
+            const countResult = await connection.query(`SELECT COUNT('order_id') as count FROM orders`);
+            return response.status(200).send({ orders: Object.values(ordersMap) , count: countResult[0][0].count });
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }finally{
+            await connection.end();
         }
-        sql += `WHERE `;
+    },
+    async deleteOne(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
+        }
+    },
 
-        let queryKeys = Object.keys(request.query);
-        let counter2 = 0;
-        for(let key of queryKeys){
-            counter2++;
-            sql += `${key} = ?`;
-            if(counter2 < queryKeys.length){
-                sql += ` AND `;
-            }
+    async update(request, response){
+        try{
+            return response.status(200).send({message: `request received`});
+        }catch(error){
+            console.log(error);
+            return response.status(500).send({error})
         }
-
-        const values = [];
-        for(let key of keys){
-            values.push(request.body[key]);
-        }
-
-        for(let key of queryKeys){
-            values.push(request.query[key]);
-        }
-       
-        const result = await connection.query(sql, [...values]);
-          
-        if(result){
-            return response.status(200).send({result});
-        }
-        return response.status(500).send({message: `UN EXPECTED ERROR OCCURRED`});
-    }catch(error){
-        console.log(error);
-        return response.status(500).send({error})
-    }finally{
-        await connection.end();
-    }
-},
-
-  // Rest of the methods...
+    },
 };
-
 module.exports = OrderController;

@@ -31,12 +31,13 @@ const p = {}
             names VARCHAR(255) NOT NULL,
             userLevel ENUM('Normal','Admin','SuperAdmin') DEFAULT 'Normal',
             company VARCHAR(255) NOT NULL,
-            password VARCHAR(255) NULL,
+            Password VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             status ENUM('Active','Inactive') DEFAULT 'Active',
             dateOfJoining DATE DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (user_id)
           );`);
+
   
           await connection.query(`CREATE TABLE IF NOT EXISTS orders (
             order_id INT NOT NULL AUTO_INCREMENT,
@@ -45,9 +46,10 @@ const p = {}
             debt FLOAT,
             PRIMARY KEY (order_id),
             FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+
           );`);
   
-          await connection.query(`CREATE TABLE IF NOT EXISTS order_item (
+          await connection.query(`CREATE TABLE IF NOT EXISTS order_item 
             order_item_id INT NOT NULL AUTO_INCREMENT,
             order_id INT NOT NULL,
             item_name VARCHAR(255) NOT NULL,
@@ -56,6 +58,8 @@ const p = {}
             PRIMARY KEY (order_item_id),
             FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
           );`);
+
+await connection.query(query);
         }
       }
       await connection.connect();
