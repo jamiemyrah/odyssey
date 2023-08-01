@@ -6,7 +6,7 @@
 const dotenv = require('dotenv');
 dotenv.config();
 const app = require('../app');
-const debug = require('debug')('odyssey:server');
+const debug = require('debug')('odyssey_2:server');
 const http = require('http');
 const { createDatabaseIfNotExists } = require('../utils/db-utils');
 

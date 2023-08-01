@@ -1,6 +1,5 @@
 const mysql2 = require('mysql2/promise');
 const p = {}
- //const { createConnection } = require('../utils/db-utils');
  const createConnection = async (createDatabase = false) => {
     try {
       const connection = await mysql2.createConnection({
@@ -31,7 +30,7 @@ const p = {}
             names VARCHAR(255) NOT NULL,
             userLevel ENUM('Normal','Admin','SuperAdmin') DEFAULT 'Normal',
             company VARCHAR(255) NOT NULL,
-            Password VARCHAR(255) NOT NULL,
+            PasswordHash VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             status ENUM('Active','Inactive') DEFAULT 'Active',
             dateOfJoining DATE DEFAULT CURRENT_TIMESTAMP,
@@ -49,7 +48,7 @@ const p = {}
 
           );`);
   
-          await connection.query(`CREATE TABLE IF NOT EXISTS order_item 
+          await connection.query(`CREATE TABLE IF NOT EXISTS order_item (
             order_item_id INT NOT NULL AUTO_INCREMENT,
             order_id INT NOT NULL,
             item_name VARCHAR(255) NOT NULL,
