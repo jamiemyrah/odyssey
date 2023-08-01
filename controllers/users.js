@@ -163,7 +163,6 @@ const UsersController = {
       request.session.destroy(); // Clear the session
       response.send({ message: "User logged out successfully" });
     } catch (error) {
-      console.error(error);
       res
         .status(500)
         .send({ message: "Failed to logout user", error: error.message });
